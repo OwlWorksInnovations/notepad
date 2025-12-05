@@ -1,0 +1,9 @@
+@font-face {
+  font-family: "ScribbleDibble";
+  src: url("./fonts/Retrobel.ttf");
+}
+
+* {
+  font-family: "ScribbleDibble";
+  margin: 0px;
+}
