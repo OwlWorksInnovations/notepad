@@ -1,28 +1,49 @@
-import useSound from "use-sound";
-
-import typeSound from "./assets/type_sound.wav";
+import { Howl } from "howler";
+import TypeSound from "./assets/sounds/type_sound.mp3";
+import { useRef } from "react";
 
 export default function Text({ text }) {
-  const [play] = useSound(typeSound, {
-    interrupt: true,
-    volume: 0.3,
-    sprite: {
-      1: [0, 241],
-      2: [241, 225],
-      3: [556, 216],
-      4: [772, 192],
-    },
+  // Creates a ref towards the stop timer and sets a debounce delay
+  const stopTimerRef = useRef(null);
+  const DEBOUNCE_DELAY = 300;
+
+  var sound = new Howl({
+    src: [TypeSound],
+    volume: 0.2,
   });
+
+  function playSound() {
+    if (!sound.playing()) {
+      sound.play();
+    }
+  }
+
+  function stopSound() {
+    if (sound.playing()) {
+      sound.stop();
+    }
+  }
+
+  function handleTyping() {
+    // Clears the previous timeout
+    if (stopTimerRef.current) {
+      clearTimeout(stopTimerRef.current);
+    }
+
+    playSound();
+
+    // Creates a timout to stop the sound
+    stopTimerRef.current = setTimeout(() => {
+      stopSound();
+    }, DEBOUNCE_DELAY);
+  }
 
   return (
     <>
       <div className="AppWrapperInner">
         <input
-          onChange={() => {
-            const randomNum = Math.floor(Math.random() * 4) + 1;
-            console.log(randomNum.toString());
-            play({ id: randomNum.toString() });
-          }}
+          onChange={handleTyping}
+          onBlur={stopSound}
           type="text"
           name="text"
           id="text"
